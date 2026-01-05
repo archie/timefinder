@@ -63,6 +63,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 0.75rem;
             padding: 1.5rem;
+            margin-top: 2rem;
             margin-bottom: 2rem;
             color: white;
         }
@@ -414,23 +415,6 @@
             <p class="subtitle">Find the perfect meeting time between Vietnam and Sweden</p>
         </header>
 
-        <div class="time-display" id="timeDisplay">
-            <div class="time-row">
-                <div class="time-zone">
-                    <div class="zone-label">Vietnam (Hanoi)</div>
-                    <div class="zone-time" id="vnTime">--:--</div>
-                    <div class="zone-day" id="vnDay">---</div>
-                </div>
-                <div class="time-diff" id="timeDiff">--</div>
-                <div class="time-zone">
-                    <div class="zone-label">Sweden (Stockholm)</div>
-                    <div class="zone-time" id="seTime">--:--</div>
-                    <div class="zone-day" id="seDay">---</div>
-                </div>
-            </div>
-            <button class="copy-btn" id="copyBtn">Copy Meeting Time</button>
-        </div>
-
         <div class="timelines-wrapper">
             <div class="timeline-section">
                 <div class="timeline-header">
@@ -451,6 +435,23 @@
                 </div>
                 <div class="timeline" id="seTimeline"></div>
             </div>
+        </div>
+
+        <div class="time-display" id="timeDisplay">
+            <div class="time-row">
+                <div class="time-zone">
+                    <div class="zone-label">Vietnam (Hanoi)</div>
+                    <div class="zone-time" id="vnTime">--:--</div>
+                    <div class="zone-day" id="vnDay">---</div>
+                </div>
+                <div class="time-diff" id="timeDiff">--</div>
+                <div class="time-zone">
+                    <div class="zone-label">Sweden (Stockholm)</div>
+                    <div class="zone-time" id="seTime">--:--</div>
+                    <div class="zone-day" id="seDay">---</div>
+                </div>
+            </div>
+            <button class="copy-btn" id="copyBtn">Copy Meeting Time</button>
         </div>
 
         <div class="legend">
