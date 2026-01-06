@@ -1,6 +1,6 @@
-# Mini Apps Collection
+# Travel Apps Collection
 
-A collection of simple, focused web applications for everyday tasks.
+A collection of simple, focused web applications for travelers.
 
 ## Apps
 
@@ -53,8 +53,8 @@ No build process or dependencies required:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/timefinder.git
-cd timefinder
+git clone https://github.com/yourusername/travelapp.git
+cd travelapp
 
 # Open in browser
 open index.html
@@ -74,13 +74,13 @@ python -m http.server 8000
 
 2. **Your site will be available at**:
    ```
-   https://yourusername.github.io/timefinder/
+   https://yourusername.github.io/travelapp/
    ```
 
 3. **Access apps**:
-   - Landing page: `https://yourusername.github.io/timefinder/`
-   - TimeFinder: `https://yourusername.github.io/timefinder/timefinder/`
-   - VND/SEK: `https://yourusername.github.io/timefinder/vndxsek/`
+   - Landing page: `https://yourusername.github.io/travelapp/`
+   - TimeFinder: `https://yourusername.github.io/travelapp/timefinder/`
+   - VND/SEK: `https://yourusername.github.io/travelapp/vndxsek/`
 
 ## Adding New Apps
 

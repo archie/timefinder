@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Mini Apps Collection** - A repository containing multiple simple, focused web applications, each in its own folder. All apps are pure static HTML/CSS/JavaScript with no build process, optimized for GitHub Pages hosting.
+**Travel Apps Collection** - A repository containing multiple simple, focused web applications for travelers, each in its own folder. All apps are pure static HTML/CSS/JavaScript with no build process, optimized for GitHub Pages hosting.
 
 ## Repository Structure
 
