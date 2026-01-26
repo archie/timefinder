@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VND ⇄ SEK Currency Converter</title>
-    <meta name="description" content="Live currency converter between Vietnamese Dong (VND) and Swedish Krona (SEK)">
+    <title>VND/THB ⇄ SEK Currency Converter</title>
+    <meta name="description" content="Live currency converter between Vietnamese Dong (VND), Thai Baht (THB), and Swedish Krona (SEK)">
     <style>
         :root {
             --primary-color: #2563eb;
@@ -91,6 +91,36 @@
         .currency-code {
             color: var(--text-secondary);
             font-size: 0.85rem;
+        }
+
+        .currency-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .toggle-button {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .toggle-button:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+
+        .toggle-button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
 
         .input-wrapper {
@@ -246,6 +276,16 @@
                 font-size: 0.75rem;
             }
 
+            .currency-toggle {
+                gap: 0.375rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .toggle-button {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+
             .currency-input {
                 font-size: 1.25rem;
                 padding: 0.75rem 1rem;
@@ -294,7 +334,7 @@
         <a href="../" class="back-link">← Back to Apps</a>
 
         <div class="header">
-            <h1>💱 VND ⇄ SEK</h1>
+            <h1>💱 VND/THB ⇄ SEK</h1>
             <p class="subtitle">Live currency converter</p>
         </div>
 
@@ -302,6 +342,10 @@
             <div class="currency-label">
                 <span class="currency-name" id="fromCurrencyName">Vietnamese Dong</span>
                 <span class="currency-code" id="fromCurrencyCode">VND</span>
+            </div>
+            <div class="currency-toggle" id="currencyToggle">
+                <button class="toggle-button active" data-currency="VND">🇻🇳 VND</button>
+                <button class="toggle-button" data-currency="THB">🇹🇭 THB</button>
             </div>
             <div class="input-wrapper">
                 <input
@@ -342,12 +386,14 @@
                 this.rate = null;
                 this.fromCurrency = 'VND';
                 this.toCurrency = 'SEK';
+                this.asianCurrency = 'VND'; // Track which Asian currency is selected
                 this.lastUpdate = null;
                 this.init();
             }
 
             init() {
                 this.setupEventListeners();
+                this.updateToggleVisibility();
                 this.updateHintVisibility();
                 this.fetchExchangeRate();
 
@@ -358,9 +404,17 @@
             setupEventListeners() {
                 const input = document.getElementById('amountInput');
                 const swapBtn = document.getElementById('swapButton');
+                const toggleButtons = document.querySelectorAll('.toggle-button');
 
                 input.addEventListener('input', () => this.convert());
                 swapBtn.addEventListener('click', () => this.swapCurrencies());
+
+                toggleButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const currency = btn.dataset.currency;
+                        this.switchAsianCurrency(currency);
+                    });
+                });
 
                 // Set initial focus
                 input.focus();
@@ -386,12 +440,46 @@
                     console.error('Error fetching exchange rate:', error);
                     this.showError('Unable to fetch live rates. Please check your connection and try again.');
 
-                    // Fallback rate (approximate)
+                    // Fallback rates (approximate)
                     if (!this.rate) {
-                        this.rate = this.fromCurrency === 'VND' ? 0.00038 : 2631.58;
+                        if (this.fromCurrency === 'VND') {
+                            this.rate = 0.00038; // VND to SEK
+                        } else if (this.fromCurrency === 'THB') {
+                            this.rate = 0.29; // THB to SEK
+                        } else if (this.fromCurrency === 'SEK') {
+                            // SEK to Asian currency
+                            this.rate = this.toCurrency === 'VND' ? 2631.58 : 3.45;
+                        }
                         document.getElementById('rateDisplay').textContent = 'Using approximate rate (offline)';
                     }
                 }
+            }
+
+            switchAsianCurrency(currency) {
+                if (this.fromCurrency !== 'SEK') {
+                    // Asian currency is on FROM side
+                    this.asianCurrency = currency;
+                    this.fromCurrency = currency;
+                } else {
+                    // Asian currency is on TO side
+                    this.asianCurrency = currency;
+                    this.toCurrency = currency;
+                }
+
+                // Update toggle button states
+                document.querySelectorAll('.toggle-button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.currency === currency);
+                });
+
+                // Update UI labels
+                this.updateCurrencyLabels();
+
+                // Update hint visibility
+                this.updateHintVisibility();
+
+                // Fetch new rate and convert
+                this.rate = null;
+                this.fetchExchangeRate();
             }
 
             convert() {
@@ -400,7 +488,7 @@
 
                 let amount = parseFloat(input.value) || 0;
 
-                // Apply 1000x multiplier when converting FROM VND
+                // Apply 1000x multiplier only when converting FROM VND
                 if (this.fromCurrency === 'VND') {
                     amount = amount * 1000;
                 }
@@ -414,11 +502,21 @@
             }
 
             swapCurrencies() {
-                // Swap currencies
-                [this.fromCurrency, this.toCurrency] = [this.toCurrency, this.fromCurrency];
+                if (this.fromCurrency === 'SEK') {
+                    // Swapping FROM SEK to Asian currency
+                    this.fromCurrency = this.asianCurrency;
+                    this.toCurrency = 'SEK';
+                } else {
+                    // Swapping FROM Asian currency to SEK
+                    this.fromCurrency = 'SEK';
+                    this.toCurrency = this.asianCurrency;
+                }
 
                 // Update UI labels
                 this.updateCurrencyLabels();
+
+                // Update toggle visibility
+                this.updateToggleVisibility();
 
                 // Update hint visibility
                 this.updateHintVisibility();
@@ -431,6 +529,7 @@
             updateCurrencyLabels() {
                 const currencies = {
                     VND: { name: 'Vietnamese Dong', code: 'VND' },
+                    THB: { name: 'Thai Baht', code: 'THB' },
                     SEK: { name: 'Swedish Krona', code: 'SEK' }
                 };
 
@@ -438,6 +537,16 @@
                 document.getElementById('fromCurrencyCode').textContent = currencies[this.fromCurrency].code;
                 document.getElementById('toCurrencyName').textContent = currencies[this.toCurrency].name;
                 document.getElementById('toCurrencyCode').textContent = currencies[this.toCurrency].code;
+            }
+
+            updateToggleVisibility() {
+                const toggle = document.getElementById('currencyToggle');
+                // Show toggle only when Asian currencies are on FROM side (not SEK)
+                if (this.fromCurrency !== 'SEK') {
+                    toggle.style.display = 'flex';
+                } else {
+                    toggle.style.display = 'none';
+                }
             }
 
             updateHintVisibility() {
@@ -470,6 +579,12 @@
                     return new Intl.NumberFormat('vi-VN', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
+                    }).format(value);
+                } else if (currency === 'THB') {
+                    // THB uses 2 decimals
+                    return new Intl.NumberFormat('th-TH', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
                     }).format(value);
                 } else {
                     // SEK uses 2 decimals
